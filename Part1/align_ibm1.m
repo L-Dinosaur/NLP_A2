@@ -76,7 +76,27 @@ function [eng, fre] = read_hansard(mydir, numSentences)
   %fre = {};
 
   % TODO: your code goes here.
-
+  DDE = dir( [ mydir, filesep, '*', 'e'] );
+  DDF = dir( [ mydir, filesep, '*', 'f'] );
+  ind = 1;
+  for i = 1:length(DDE)
+      Elines = textread([mydir, filesep, DDE(i).name], '%s', 'delimiter','\n');
+      Flines = textread([mydir, filesep, DDF(i).name], '%s', 'delimiter','\n');
+      
+      for l=1:length(Elines)
+          preprocessedLine = preprocess(Elines{l}, 'e');
+          eng{ind} = strsplit(' ', preprocessedLine);
+          preprocessedLine = preprocess(Flines{l}, 'f');
+          fre{ind} = strsplit(' ', preprocessedLine);
+          ind = ind + 1
+          if(ind > numSentences)
+              break;
+          end
+      end
+      if(ind > numSentences)
+          break
+      end
+  end
 end
 
 
@@ -85,10 +105,38 @@ function AM = initialize(eng, fre)
 % Initialize alignment model uniformly.
 % Only set non-zero probabilities where word pairs appear in corresponding sentences.
 %
-    AM = {}; % AM.(english_word).(foreign_word)
+    AM = struct(); % AM.(english_word).(foreign_word)
 
     % TODO: your code goes here
-
+    for i=1:length(eng)           %| These two layers of for loop
+        for j=1:length(eng{i})    %| loops through each english word
+            
+            eng_word = eng{i}{j}; %| now we have a english word
+            if(isfield(AM, eng_word) == 0) %| if it has not been counted
+                                           %| then we need to initialize it
+                                           
+                AM.(eng_word) = struct();  %| Instantiate the structure
+                
+                wordlis = {};   %| Collect all French words that share 
+                                %| alignments with this english word
+              
+                count = 1;
+                for k=1:length(eng)
+                    if(any(strcmp(eng{k}, eng_word)) == 1) 
+                        for l=1:length(fre{k})
+                            if(any(strcmp(wordlis, fre{k}{l})) == 1)
+                                wordlis{count} = fre{k}{l};
+                                count = count + 1;
+                            end
+                        end
+                    end
+                end
+                for k=1:length(wordlis)
+                    AM.(eng_word).(wordlis{k}) = 1 / (count - 1);
+                end
+            end
+        end
+    end
 end
 
 function t = em_step(t, eng, fre)
