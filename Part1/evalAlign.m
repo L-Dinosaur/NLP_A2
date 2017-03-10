@@ -5,14 +5,14 @@
 %  Task 5. 
 
 % some of your definitions
-trainDir     = TODO;
-testDir      = TODO;
-fn_LME       = TODO;
-fn_LMF       = TODO;
-lm_type      = TODO;
-delta        = TODO;
-vocabSize    = TODO; 
-numSentences = TODO;
+trainDir     = '/u/cs401/A2_SMT/data/Hansard/Training';
+testDir      = '/u/cs401/A2_SMT/data/Hansard/Testing';
+fn_LME       = '~/Desktop/401/A2_SMT/Models/LM_e.mat';
+fn_LMF       = '~/Desktop/401/A2_SMT/Models/LM_f.mat';
+lm_type      = 'smooth';
+delta        = 0.1;
+vocabSize    = ; 
+numSentences = 1000;
 
 % Train your language models. This is task 2 which makes use of task 1
 LME = lm_train( trainDir, 'e', fn_LME );
@@ -31,4 +31,4 @@ eng = decode( fre, LME, AMFE, 'smooth', delta, vocabSize );
 % TODO: perform some analysis
 % add BlueMix code here 
 
-[status, result] = unix('')
+[status, result] = unix('');

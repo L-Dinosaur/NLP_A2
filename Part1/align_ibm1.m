@@ -110,13 +110,18 @@ AM = {}; % AM.(english_word).(foreign_word)
 % TODO: your code goes here
 for i=1:length(eng)           %| These two layers of for loop
     for j=1:length(eng{i})    %| loops through each english word
-        
         ew = eng{i}{j};       %| ew for English Word
+        if(strcmp(ew, 'SENTSTART') || strcmp(ew, 'SENTEND'))
+            continue;
+        end
         if(isfield(AM, ew) == 0)
             AM.(ew) = {};
         end
         for k=1:length(fre{i})
             fw = fre{i}{k};
+            if(strcmp(fw, 'SENTSTART') || strcmp(fw, 'SENTEND'))
+                continue;
+            end
             AM.(ew).(fw) = 1;
             
         end
@@ -131,6 +136,9 @@ for i=1:length(fields)
     end
     
 end
+
+AM.SENTSTART.SENTSTART = 1;
+AM.SENTEND.SENTEND = 1;
 end
 
 
@@ -159,16 +167,25 @@ for i=1:length(eng)
         denom_c = 0;
         f = F_set{l};
         fcount = sum(strcmp(F,f));
-        
+        if(strcmp(f, 'SENTSTART') || strcmp(f, 'SENTEND'))
+            continue;
+        end        
         for j=1:length(E_set)
             e = E_set{j};
+            
+            if(strcmp(e, 'SENTSTART') || strcmp(e, 'SENTEND'))
+                continue;
+            end
+            
             denom_c = denom_c + t.(e).(f) * fcount;
         end
         
         for k=1:length(E_set)
             e = E_set{k};
             ecount = sum(strcmp(E,e));
-            
+            if(strcmp(e, 'SENTSTART') || strcmp(e, 'SENTEND'))
+                continue;
+            end            
             
             if(isfield(tcount, f) == 0)
                 tcount.(f).(e) = t.(e).(f) * fcount * ecount / denom_c;
@@ -194,8 +211,16 @@ total_fields = fieldnames(total);
 for k=1:length(total_fields)
     tcount_fields = fieldnames(tcount);
     e = total_fields{k};
+    
+    if(strcmp(e, 'SENTSTART') || strcmp(e, 'SENTEND'))
+        continue;
+    end
+    
     for j=1:length(tcount_fields)
         f = tcount_fields{j};
+        if(strcmp(f, 'SENTSTART') || strcmp(f, 'SENTEND'))
+            continue;
+        end
         if(isfield(tcount.(f),e) == 0)
             t1 = 0;
         else
@@ -205,6 +230,8 @@ for k=1:length(total_fields)
         t.(e).(f) = t1/t2;
     end
 end
+
+
 
 end
 
